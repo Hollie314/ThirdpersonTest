@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerLocomotion : MonoBehaviour
 {
@@ -7,8 +8,13 @@ public class PlayerLocomotion : MonoBehaviour
     Vector3 moveDirection;
     Transform cameraObject;
     Rigidbody playerRigidbody;
-
-    public float movementSpeed = 7f;
+    
+    public bool isSprinting;
+    
+    [Header("Movement Speed")]
+    public float walkingSpeed = 1.5f;
+    public float runningSpeed = 5f;
+    public float sprintSpeed = 7;
     public float rotationSpeed = 15f;
 
     private void Awake()
@@ -30,8 +36,23 @@ public class PlayerLocomotion : MonoBehaviour
         moveDirection += cameraObject.right * inputManager.horizontalInput;
         moveDirection.Normalize();
         moveDirection.y = 0;
-        moveDirection *= movementSpeed;
 
+        if (isSprinting)
+        {
+            moveDirection = moveDirection * sprintSpeed; 
+        }
+        else
+        {
+            if (inputManager.moveAmount >= 0.5f)
+            {
+                moveDirection = moveDirection * runningSpeed;
+            }
+            else
+            {
+                moveDirection = moveDirection * walkingSpeed;
+            }
+        }
+        
         // Ne pas écraser la vélocité verticale (gravité, saut, etc.)
         playerRigidbody.linearVelocity = new Vector3(moveDirection.x, playerRigidbody.linearVelocity.y, moveDirection.z);
     }
